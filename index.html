@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Tahfidz Harian</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+
+  /* NAV */
+  nav { background: #1a6b4a; color: white; padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+  nav h1 { font-size: 18px; font-weight: 600; }
+  nav span { font-size: 13px; opacity: 0.8; flex: 1; }
+  #mode-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+
+  /* TABS */
+  .tabs { display: flex; background: white; border-bottom: 2px solid #e2e8f0; }
+  .tab { padding: 12px 20px; cursor: pointer; font-size: 14px; color: #718096; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: #1a6b4a; border-bottom-color: #1a6b4a; font-weight: 600; }
+
+  /* LOGIN */
+  .login-wrap { display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
+  .login-card { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .login-card h2 { font-size: 20px; margin-bottom: 6px; color: #1a6b4a; }
+  .login-card p { font-size: 13px; color: #718096; margin-bottom: 24px; }
+  .login-options { display: flex; gap: 12px; margin-bottom: 20px; }
+  .login-btn { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
+  .login-btn:hover, .login-btn.active { border-color: #1a6b4a; background: #f0faf4; color: #1a6b4a; }
+
+  /* FORMS & INPUTS */
+  .container { max-width: 700px; margin: 0 auto; padding: 20px; }
+  .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .card h3 { font-size: 16px; color: #1a6b4a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+  input, select, textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border .2s; background: #fafafa; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #1a6b4a; background: white; }
+  textarea { resize: vertical; min-height: 70px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-group { margin-bottom: 12px; }
+  .btn { padding: 11px 24px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; }
+  .btn-primary { background: #1a6b4a; color: white; width: 100%; }
+  .btn-primary:hover { background: #15573c; }
+  .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 6px; }
+  .btn-danger { background: #fff0f0; color: #c53030; border: 1px solid #fed7d7; }
+  .btn-outline { background: white; border: 1.5px solid #1a6b4a; color: #1a6b4a; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-green { background: #c6f6d5; color: #22543d; }
+  .badge-blue { background: #bee3f8; color: #2a4365; }
+  .badge-purple { background: #e9d8fd; color: #44337a; }
+  .badge-orange { background: #feebc8; color: #7b341e; }
+
+  /* LAPORAN LIST */
+  .laporan-item { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; transition: border .2s; }
+  .laporan-item:hover { border-color: #9ae6b4; }
+  .laporan-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+  .laporan-nama { font-weight: 700; font-size: 15px; color: #1a202c; }
+  .laporan-tanggal { font-size: 12px; color: #a0aec0; }
+  .laporan-detail { margin-top: 8px; font-size: 13px; color: #4a5568; line-height: 1.6; }
+  .laporan-catatan { margin-top: 6px; font-size: 13px; color: #718096; font-style: italic; }
+  .nilai-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* WALI VIEW */
+  .wali-header { text-align: center; padding: 24px 20px 16px; }
+  .wali-header h2 { font-size: 22px; color: #1a6b4a; margin-bottom: 4px; }
+  .wali-header p { color: #718096; font-size: 14px; }
+  .santri-select-card { background: white; border-radius: 14px; padding: 20px; margin: 0 20px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .progress-bar-wrap { background: #e2e8f0; border-radius: 20px; height: 12px; overflow: hidden; }
+  .progress-bar { background: linear-gradient(90deg, #1a6b4a, #38a169); height: 12px; border-radius: 20px; transition: width .5s; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-box { background: #f7fafc; border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-box .val { font-size: 22px; font-weight: 700; color: #1a6b4a; }
+  .stat-box .lbl { font-size: 11px; color: #718096; margin-top: 2px; }
+
+  /* SEARCH */
+  .search-bar { position: relative; margin-bottom: 14px; }
+  .search-bar input { padding-left: 36px; }
+  .search-bar::before { content: "🔍"; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 40px 20px; color: #a0aec0; }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* ALERT */
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
+  .alert-success { background: #c6f6d5; color: #22543d; }
+  .alert-error { background: #fed7d7; color: #9b2c2c; }
+
+  /* TOPBAR GURU */
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+  .topbar h2 { font-size: 17px; font-weight: 700; }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); }
+    nav h1 { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span>📖</span>
+  <h1>Laporan Tahfidz Harian</h1>
+  <span id="nav-info"></span>
+  <span id="mode-badge">-</span>
+</nav>
+
+<div id="app"></div>
+
+<script>
+// ── DATA HELPERS ──────────────────────────────────────────────────────
+const getData = (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } };
+const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+// Inisialisasi data awal jika kosong
+if (!getData('santri', null)) {
+  setData('santri', [
+    { id: 1, nama: 'Ahmad Fauzi', kelas: '4A', targetJuz: 5 },
+    { id: 2, nama: 'Siti Aminah', kelas: '4A', targetJuz: 5 },
+    { id: 3, nama: 'Muhammad Rizki', kelas: '4B', targetJuz: 3 },
+  ]);
+}
+if (!getData('laporan', null)) {
+  setData('laporan', [
+    { id: 1, santriId: 1, tanggal: '2025-01-15', jenis: 'ziyadah', surah: 'Al-Baqarah', ayatMulai: 1, ayatSelesai: 20, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'B', catatan: 'Bacaan bagus, perlu perhatikan mad', guru: 'Ust. Abdullah' },
+    { id: 2, santriId: 2, tanggal: '2025-01-15', jenis: 'murojaah', surah: 'Al-Fatihah', ayatMulai: 1, ayatSelesai: 7, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'A', catatan: 'Sangat lancar dan fasih', guru: 'Ust. Abdullah' },
+  ]);
+}
+if (!getData('guruPin', null)) setData('guruPin', '1234');
+if (!getData('waliData', null)) {
+  setData('waliData', [
+    { santriId: 1, pin: '0001' },
+    { santriId: 2, pin: '0002' },
+    { santriId: 3, pin: '0003' },
+  ]);
+}
+
+let currentMode = null; // 'guru' | 'wali'
+let currentSantriId = null;
+let activeTab = 'input';
+let alertMsg = null;
+
+// ── RENDER ────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (!currentMode) { app.innerHTML = renderLogin(); return; }
+  if (currentMode === 'guru') { app.innerHTML = renderGuru(); }
+  if (currentMode === 'wali') { app.innerHTML = renderWali(); }
+  updateNav();
+}
+
+function updateNav() {
+  document.getElementById('mode-badge').textContent = currentMode === 'guru' ? '👨‍🏫 Guru' : '👨‍👩‍👦 Wali Murid';
+  document.getElementById('nav-info').textContent = '';
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────
+let loginRole = 'wali';
+
+function renderLogin() {
+  return `
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Assalamu'alaikum</h2>
+      <p>Silakan pilih login sebagai:</p>
+      <div class="login-options">
+        <button class="login-btn ${loginRole==='wali'?'active':''}" onclick="setRole('wali')">👨‍👩‍👦 Wali Murid</button>
+        <button class="login-btn ${loginRole==='guru'?'active':''}" onclick="setRole('guru')">👨‍🏫 Guru</button>
+      </div>
+      <div class="form-group">
+        <label>${loginRole === 'guru' ? 'PIN Guru' : 'PIN Wali Murid'}</label>
+        <input type="password" id="pin-input" placeholder="Masukkan PIN" inputmode="numeric" maxlength="6" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      ${loginRole === 'wali' ? '<p style="font-size:12px;color:#718096;margin-bottom:12px">PIN diberikan oleh guru/sekolah untuk setiap wali murid</p>' : ''}
+      <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
+      <div id="login-err"></div>
+      <div style="margin-top:20px;padding:12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">
+        <b>Demo PIN:</b><br>
+        Guru: <b>1234</b><br>
+        Wali Ahmad Fauzi: <b>0001</b> &nbsp;|&nbsp; Wali Siti Aminah: <b>0002</b>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setRole(r) { loginRole = r; render(); setTimeout(()=>document.getElementById('pin-input')?.focus(),50); }
+
+function doLogin() {
+  const pin = document.getElementById('pin-input').value.trim();
+  if (loginRole === 'guru') {
+    if (pin === getData('guruPin', '1234')) { currentMode = 'guru'; activeTab = 'input'; render(); return; }
+    document.getElementById('login-err').innerHTML = '<div class="alert alert-error" style="margin-top:10px">PIN salah</div>';
+  } else {
+    const wali = getData('waliData', []).find(w => w.pin === pin);
+    if (wali) { currentMode = 'wali'; currentSantriId = wali.santriId; render(); return; }
+    document.getElementById('login-err').innerHTML = '<div class="alert alert-error" style="margin-top:10px">PIN tidak ditemukan</div>';
+  }
+}
+
+// ── GURU VIEW ─────────────────────────────────────────────────────────
+function renderGuru() {
+  const tabs = ['input','daftar','santri'];
+  const tabLabel = {'input':'📝 Input Laporan','daftar':'📋 Daftar Laporan','santri':'👥 Data Santri'};
+  let content = '';
+  if (activeTab === 'input') content = renderInputForm();
+  if (activeTab === 'daftar') content = renderDaftarLaporan();
+  if (activeTab === 'santri') content = renderDataSantri();
+  return `
+  <div class="tabs">
+    ${tabs.map(t=>`<div class="tab ${activeTab===t?'active':''}" onclick="setTab('${t}')">${tabLabel[t]}</div>`).join('')}
+    <div style="margin-left:auto;padding:8px 14px;cursor:pointer;font-size:13px;color:#718096" onclick="logout()">Keluar</div>
+  </div>
+  <div class="container">${content}</div>`;
+}
+
+function setTab(t) { activeTab = t; alertMsg = null; render(); }
+
+function renderInputForm() {
+  const santri = getData('santri', []);
+  return `
+  ${alertMsg ? `<div class="alert alert-success">${alertMsg}</div>` : ''}
+  <div class="card">
+    <h3>✏️ Input Setoran / Murojaah</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nama Santri</label>
+        <select id="f-santri">
+          <option value="">-- Pilih Santri --</option>
+          ${santri.map(s=>`<option value="${s.id}">${s.nama} (${s.kelas})</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tanggal</label>
+        <input type="date" id="f-tanggal" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jenis</label>
+        <select id="f-jenis">
+          <option value="ziyadah">Ziyadah (Hafalan Baru)</option>
+          <option value="murojaah">Murojaah (Hafalan Lama)</option>
+          <option value="sabak">Sabak (Setoran Harian)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nama Surah</label>
+        <input type="text" id="f-surah" placeholder="Contoh: Al-Baqarah">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Ayat Mulai</label>
+        <input type="number" id="f-ayat-mulai" placeholder="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>Ayat Selesai</label>
+        <input type="number" id="f-ayat-selesai" placeholder="20" min="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Halaman ke-</label>
+        <input type="number" id="f-halaman" placeholder="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>Nama Guru</label>
+        <input type="text" id="f-guru" placeholder="Ust./Usth. ...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nilai Tajwid</label>
+        <select id="f-tajwid">
+          <option value="A">A (Sangat Baik)</option>
+          <option value="B">B (Baik)</option>
+          <option value="C">C (Cukup)</option>
+          <option value="D">D (Perlu Latihan)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nilai Kelancaran</label>
+        <select id="f-fasih">
+          <option value="A">A (Sangat Lancar)</option>
+          <option value="B">B (Lancar)</option>
+          <option value="C">C (Cukup)</option>
+          <option value="D">D (Perlu Latihan)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Catatan untuk Wali Murid</label>
+      <textarea id="f-catatan" placeholder="Tuliskan perkembangan, saran, atau informasi untuk orang tua..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="simpanLaporan()">💾 Simpan Laporan</button>
+  </div>`;
+}
+
+function simpanLaporan() {
+  const santriId = parseInt(document.getElementById('f-santri').value);
+  const tanggal = document.getElementById('f-tanggal').value;
+  const surah = document.getElementById('f-surah').value.trim();
+  if (!santriId) { alert('Pilih santri terlebih dahulu'); return; }
+  if (!tanggal) { alert('Isi tanggal'); return; }
+  if (!surah) { alert('Isi nama surah'); return; }
+  const laporan = getData('laporan', []);
+  const id = Date.now();
+  laporan.unshift({
+    id, santriId, tanggal,
+    jenis: document.getElementById('f-jenis').value,
+    surah,
+    ayatMulai: parseInt(document.getElementById('f-ayat-mulai').value) || 1,
+    ayatSelesai: parseInt(document.getElementById('f-ayat-selesai').value) || 1,
+    halaman: parseInt(document.getElementById('f-halaman').value) || 1,
+    nilaiTajwid: document.getElementById('f-tajwid').value,
+    nilaiFasih: document.getElementById('f-fasih').value,
+    catatan: document.getElementById('f-catatan').value.trim(),
+    guru: document.getElementById('f-guru').value.trim() || 'Guru',
+  });
+  setData('laporan', laporan);
+  alertMsg = '✅ Laporan berhasil disimpan! Wali murid dapat melihatnya sekarang.';
+  render();
+}
+
+function renderDaftarLaporan() {
+  const laporan = getData('laporan', []);
+  const santri = getData('santri', []);
+  const search = document.getElementById('search-val')?.value || '';
+  let filtered = laporan;
+  if (search) filtered = laporan.filter(l => {
+    const s = santri.find(x=>x.id===l.santriId);
+    return s?.nama.toLowerCase().includes(search.toLowerCase()) || l.surah.toLowerCase().includes(search.toLowerCase());
+  });
+  return `
+  <div class="topbar">
+    <h2>Daftar Laporan (${filtered.length})</h2>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="search-val" placeholder="Cari nama santri atau surah..." oninput="renderSearch()" value="${search}">
+  </div>
+  ${filtered.length === 0 ? `<div class="empty"><div class="empty-icon">📄</div><p>Belum ada laporan</p></div>` :
+    filtered.map(l => {
+      const s = santri.find(x=>x.id===l.santriId);
+      const jenisColor = l.jenis==='ziyadah'?'badge-green':l.jenis==='murojaah'?'badge-blue':'badge-purple';
+      return `<div class="laporan-item">
+        <div class="laporan-header">
+          <div>
+            <div class="laporan-nama">${s?.nama || 'Tidak diketahui'}</div>
+            <div class="laporan-tanggal">${formatTanggal(l.tanggal)} · ${l.guru}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="badge ${jenisColor}">${l.jenis}</span>
+            <button class="btn btn-sm btn-danger" onclick="hapusLaporan(${l.id})">🗑</button>
+          </div>
+        </div>
+        <div class="laporan-detail">
+          📖 ${l.surah} ayat ${l.ayatMulai}–${l.ayatSelesai} · Hal. ${l.halaman}
+        </div>
+        <div class="nilai-row">
+          <span class="badge badge-green">Tajwid: ${l.nilaiTajwid}</span>
+          <span class="badge badge-blue">Kelancaran: ${l.nilaiFasih}</span>
+        </div>
+        ${l.catatan ? `<div class="laporan-catatan">💬 "${l.catatan}"</div>` : ''}
+      </div>`;
+    }).join('')}`;
+}
+
+function renderSearch() {
+  document.querySelector('.container').innerHTML = renderDaftarLaporan();
+}
+
+function hapusLaporan(id) {
+  if (!confirm('Hapus laporan ini?')) return;
+  const laporan = getData('laporan', []).filter(l => l.id !== id);
+  setData('laporan', laporan);
+  render();
+}
+
+function renderDataSantri() {
+  const santri = getData('santri', []);
+  const wali = getData('waliData', []);
+  return `
+  <div class="topbar">
+    <h2>Data Santri</h2>
+    <button class="btn btn-outline btn-sm" onclick="tambahSantri()">+ Tambah</button>
+  </div>
+  ${santri.map(s => {
+    const w = wali.find(x=>x.santriId===s.id);
+    return `<div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:700">${s.nama}</div>
+          <div style="font-size:13px;color:#718096">Kelas ${s.kelas} · Target ${s.targetJuz} Juz</div>
+          <div style="font-size:12px;color:#a0aec0;margin-top:4px">PIN Wali: <b>${w?.pin || '-'}</b></div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="hapusSantri(${s.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('')}
+  <div class="card" style="margin-top:20px">
+    <h3>➕ Tambah Santri Baru</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nama Lengkap</label><input type="text" id="ns-nama" placeholder="Nama santri"></div>
+      <div class="form-group"><label>Kelas</label><input type="text" id="ns-kelas" placeholder="4A"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Target Juz</label><input type="number" id="ns-target" placeholder="5" min="1" max="30"></div>
+      <div class="form-group"><label>PIN Wali (unik)</label><input type="text" id="ns-pin" placeholder="4 digit angka" maxlength="6"></div>
+    </div>
+    <button class="btn btn-primary" onclick="simpanSantri()">Simpan Santri</button>
+  </div>`;
+}
+
+function tambahSantri() { setTab('santri'); }
+
+function simpanSantri() {
+  const nama = document.getElementById('ns-nama').value.trim();
+  const kelas = document.getElementById('ns-kelas').value.trim();
+  const target = parseInt(document.getElementById('ns-target').value) || 5;
+  const pin = document.getElementById('ns-pin').value.trim();
+  if (!nama || !kelas || !pin) { alert('Lengkapi semua data'); return; }
+  const santri = getData('santri', []);
+  const wali = getData('waliData', []);
+  if (wali.some(w=>w.pin===pin)) { alert('PIN sudah dipakai santri lain'); return; }
+  const id = Date.now();
+  santri.push({ id, nama, kelas, targetJuz: target });
+  wali.push({ santriId: id, pin });
+  setData('santri', santri);
+  setData('waliData', wali);
+  alertMsg = `✅ Santri ${nama} berhasil ditambahkan. PIN wali: ${pin}`;
+  render();
+}
+
+function hapusSantri(id) {
+  if (!confirm('Hapus santri ini? Semua laporan terkait akan ikut terhapus.')) return;
+  setData('santri', getData('santri',[]).filter(s=>s.id!==id));
+  setData('waliData', getData('waliData',[]).filter(w=>w.santriId!==id));
+  setData('laporan', getData('laporan',[]).filter(l=>l.santriId!==id));
+  render();
+}
+
+// ── WALI VIEW ─────────────────────────────────────────────────────────
+function renderWali() {
+  const santri = getData('santri', []).find(s=>s.id===currentSantriId);
+  if (!santri) { currentMode = null; render(); return ''; }
+  const laporan = getData('laporan', []).filter(l=>l.santriId===currentSantriId);
+  const totalHalaman = laporan.reduce((a,l)=> a + (l.jenis==='ziyadah' ? (l.ayatSelesai-l.ayatMulai+1) : 0), 0);
+  const sesiCount = laporan.length;
+  const avgTajwid = laporan.length ? laporan.filter(l=>l.nilaiTajwid==='A').length : 0;
+  const progress = Math.min(100, Math.round((totalHalaman / (santri.targetJuz * 600)) * 100));
+
+  return `
+  <div style="display:flex;justify-content:flex-end;padding:8px 16px">
+    <span onclick="logout()" style="cursor:pointer;font-size:13px;color:#718096">Keluar</span>
+  </div>
+  <div class="wali-header">
+    <h2>Assalamu'alaikum</h2>
+    <p>Laporan tahfidz putra/putri Anda</p>
+  </div>
+  <div class="container" style="padding-top:0">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:48px;height:48px;background:#c6f6d5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">📖</div>
+        <div>
+          <div style="font-size:18px;font-weight:700">${santri.nama}</div>
+          <div style="font-size:13px;color:#718096">Kelas ${santri.kelas} · Target ${santri.targetJuz} Juz</div>
+        </div>
+      </div>
+      <div style="margin-bottom:6px;font-size:13px;color:#4a5568;font-weight:600">Progress Hafalan</div>
+      <div class="progress-bar-wrap" style="margin-bottom:6px">
+        <div class="progress-bar" style="width:${progress}%"></div>
+      </div>
+      <div style="font-size:12px;color:#718096;text-align:right">${progress}% dari target</div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="val">${sesiCount}</div><div class="lbl">Total Sesi</div></div>
+      <div class="stat-box"><div class="val">${totalHalaman}</div><div class="lbl">Ayat Dihafal</div></div>
+      <div class="stat-box"><div class="val">${avgTajwid}</div><div class="lbl">Nilai A Tajwid</div></div>
+    </div>
+
+    <div class="card">
+      <h3>📋 Riwayat Setoran</h3>
+      ${laporan.length === 0 ? `<div class="empty"><div class="empty-icon">📄</div><p>Belum ada laporan</p></div>` :
+        laporan.map(l => {
+          const jenisColor = l.jenis==='ziyadah'?'badge-green':l.jenis==='murojaah'?'badge-blue':'badge-purple';
+          return `<div class="laporan-item">
+            <div class="laporan-header">
+              <div>
+                <div class="laporan-tanggal">${formatTanggal(l.tanggal)} · ${l.guru}</div>
+              </div>
+              <span class="badge ${jenisColor}">${l.jenis}</span>
+            </div>
+            <div class="laporan-detail">📖 ${l.surah} ayat ${l.ayatMulai}–${l.ayatSelesai}</div>
+            <div class="nilai-row">
+              <span class="badge badge-green">Tajwid: ${l.nilaiTajwid}</span>
+              <span class="badge badge-blue">Kelancaran: ${l.nilaiFasih}</span>
+            </div>
+            ${l.catatan ? `<div class="laporan-catatan">💬 ${l.catatan}</div>` : ''}
+          </div>`;
+        }).join('')}
+    </div>
+  </div>`;
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function logout() { currentMode = null; currentSantriId = null; loginRole = 'wali'; render(); }
+
+function formatTanggal(str) {
+  try {
+    const d = new Date(str + 'T00:00:00');
+    return d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  } catch { return str; }
+}
+
+// Mulai
+render();
+</script>
+</body>
+</html>
