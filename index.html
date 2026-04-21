@@ -44,6 +44,7 @@
   .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 6px; }
   .btn-danger { background: #fff0f0; color: #c53030; border: 1px solid #fed7d7; }
   .btn-outline { background: white; border: 1.5px solid #1a6b4a; color: #1a6b4a; }
+  .btn-edit { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
 
   /* BADGES */
   .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
@@ -98,6 +99,13 @@
   .pin-item { font-size: 12px; color: #78350f; padding: 4px 0; }
   .pin-item strong { color: #92400e; }
 
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-box { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+  .modal-box h3 { font-size: 17px; color: #1a6b4a; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .modal-actions .btn { flex: 1; }
+
   /* RESPONSIVE */
   @media (max-width: 480px) {
     .form-row { grid-template-columns: 1fr; }
@@ -116,45 +124,118 @@
 </nav>
 
 <div id="app"></div>
+<div id="modal-container"></div>
 
 <script>
+// ── DATA SURAH JUZ 28-30 ──────────────────────────────────────────────
+const SURAH_DATA = [
+  // JUZ 28
+  { nama: 'Al-Mujadila (58)', juz: 28, ayat: 22 },
+  { nama: 'Al-Hasyr (59)', juz: 28, ayat: 24 },
+  { nama: 'Al-Mumtahanah (60)', juz: 28, ayat: 13 },
+  { nama: 'As-Saff (61)', juz: 28, ayat: 14 },
+  { nama: 'Al-Jumuah (62)', juz: 28, ayat: 11 },
+  { nama: 'Al-Munafiqun (63)', juz: 28, ayat: 11 },
+  { nama: 'At-Tagabun (64)', juz: 28, ayat: 18 },
+  { nama: 'At-Talaq (65)', juz: 28, ayat: 12 },
+  { nama: 'At-Tahrim (66)', juz: 28, ayat: 12 },
+  // JUZ 29
+  { nama: 'Al-Mulk (67)', juz: 29, ayat: 30 },
+  { nama: 'Al-Qalam (68)', juz: 29, ayat: 52 },
+  { nama: 'Al-Haqqah (69)', juz: 29, ayat: 52 },
+  { nama: 'Al-Maarij (70)', juz: 29, ayat: 44 },
+  { nama: 'Nuh (71)', juz: 29, ayat: 28 },
+  { nama: 'Al-Jinn (72)', juz: 29, ayat: 28 },
+  { nama: 'Al-Muzzammil (73)', juz: 29, ayat: 20 },
+  { nama: 'Al-Muddassir (74)', juz: 29, ayat: 56 },
+  { nama: 'Al-Qiyamah (75)', juz: 29, ayat: 40 },
+  { nama: 'Al-Insan (76)', juz: 29, ayat: 31 },
+  { nama: 'Al-Mursalat (77)', juz: 29, ayat: 50 },
+  // JUZ 30
+  { nama: 'An-Naba (78)', juz: 30, ayat: 40 },
+  { nama: 'An-Naziat (79)', juz: 30, ayat: 46 },
+  { nama: 'Abasa (80)', juz: 30, ayat: 42 },
+  { nama: 'At-Takwir (81)', juz: 30, ayat: 29 },
+  { nama: 'Al-Infitar (82)', juz: 30, ayat: 19 },
+  { nama: 'Al-Mutaffifin (83)', juz: 30, ayat: 36 },
+  { nama: 'Al-Insyiqaq (84)', juz: 30, ayat: 25 },
+  { nama: "Al-Buruj (85)", juz: 30, ayat: 22 },
+  { nama: 'At-Tariq (86)', juz: 30, ayat: 17 },
+  { nama: 'Al-Ala (87)', juz: 30, ayat: 19 },
+  { nama: 'Al-Gasyiyah (88)', juz: 30, ayat: 26 },
+  { nama: 'Al-Fajr (89)', juz: 30, ayat: 30 },
+  { nama: 'Al-Balad (90)', juz: 30, ayat: 20 },
+  { nama: 'Asy-Syams (91)', juz: 30, ayat: 15 },
+  { nama: 'Al-Lail (92)', juz: 30, ayat: 21 },
+  { nama: 'Ad-Duha (93)', juz: 30, ayat: 11 },
+  { nama: 'Asy-Syarh (94)', juz: 30, ayat: 8 },
+  { nama: 'At-Tin (95)', juz: 30, ayat: 8 },
+  { nama: 'Al-Alaq (96)', juz: 30, ayat: 19 },
+  { nama: 'Al-Qadr (97)', juz: 30, ayat: 5 },
+  { nama: 'Al-Bayyinah (98)', juz: 30, ayat: 8 },
+  { nama: 'Az-Zalzalah (99)', juz: 30, ayat: 8 },
+  { nama: 'Al-Adiyat (100)', juz: 30, ayat: 11 },
+  { nama: 'Al-Qariah (101)', juz: 30, ayat: 11 },
+  { nama: 'At-Takasur (102)', juz: 30, ayat: 8 },
+  { nama: 'Al-Asr (103)', juz: 30, ayat: 3 },
+  { nama: 'Al-Humazah (104)', juz: 30, ayat: 9 },
+  { nama: 'Al-Fil (105)', juz: 30, ayat: 5 },
+  { nama: 'Quraisy (106)', juz: 30, ayat: 4 },
+  { nama: 'Al-Maun (107)', juz: 30, ayat: 7 },
+  { nama: 'Al-Kausar (108)', juz: 30, ayat: 3 },
+  { nama: 'Al-Kafirun (109)', juz: 30, ayat: 6 },
+  { nama: 'An-Nasr (110)', juz: 30, ayat: 3 },
+  { nama: 'Al-Lahab (111)', juz: 30, ayat: 5 },
+  { nama: 'Al-Ikhlas (112)', juz: 30, ayat: 4 },
+  { nama: 'Al-Falaq (113)', juz: 30, ayat: 5 },
+  { nama: 'An-Nas (114)', juz: 30, ayat: 6 },
+];
+
 // ── DATA HELPERS ──────────────────────────────────────────────────────
 const getData = (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } };
 const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
-// Inisialisasi data awal - 22 siswa sesuai daftar
+// Reset data jika kelas masih 4A (migrasi ke 2A)
+(function migrateData() {
+  const existing = getData('santri', null);
+  if (existing && existing[0] && existing[0].kelas === '4A') {
+    localStorage.removeItem('santri');
+  }
+})();
+
+// Inisialisasi data awal - 22 siswa kelas 2A
 if (!getData('santri', null)) {
   setData('santri', [
-    { id: 1, nama: 'Airlangga Saputra', kelas: '2a', targetJuz: 2, noAbsen: 1 },
-    { id: 2, nama: 'Alya Farzana Ayunindya', kelas: '2A', targetJuz: 2, noAbsen: 2 },
-    { id: 3, nama: 'Alya Nidaulkarimah', kelas: '2A', targetJuz: 2, noAbsen: 3 },
-    { id: 4, nama: 'Ashalina Ersya Bella', kelas: '2A', targetJuz: 2, noAbsen: 4 },
-    { id: 5, nama: 'Athalla Alfarizqi', kelas: '2A', targetJuz: 2, noAbsen: 5 },
-    { id: 6, nama: 'Azril Rahandika Alfariq', kelas: '2A', targetJuz: 2, noAbsen: 6 },
-    { id: 7, nama: 'Dafaa Asykar Raauf', kelas: '2A', targetJuz: 2, noAbsen: 7 },
-    { id: 8, nama: 'Fillio Farzana Abrisam', kelas: '2A', targetJuz: 2, noAbsen: 8 },
-    { id: 9, nama: 'Hafizh Althaf Alfarrisy', kelas: '2A', targetJuz: 2, noAbsen: 9 },
-    { id: 10, nama: 'Haikhal Putra Pranata', kelas: '2A', targetJuz: 2, noAbsen: 10 },
-    { id: 11, nama: 'Hisa Yumna Ayu', kelas: '2A', targetJuz: 2, noAbsen: 11 },
-    { id: 12, nama: 'Keinarra Nayla Azzahra', kelas: '2A', targetJuz: 2, noAbsen: 12 },
-    { id: 13, nama: 'Kevin Nathan Mahardika', kelas: '2A', targetJuz: 2, noAbsen: 13 },
-    { id: 14, nama: 'Khofifah Yies Sa\'diyah', kelas: '2A', targetJuz: 2, noAbsen: 14 },
-    { id: 15, nama: 'Muhammad Rizky Zam Zam', kelas: '2A', targetJuz: 2, noAbsen: 15 },
-    { id: 16, nama: 'Mustofa Setyo Nugroho', kelas: '2A', targetJuz: 2, noAbsen: 16 },
-    { id: 17, nama: 'Muthi\'ah Azza Alfara', kelas: '2A', targetJuz: 2, noAbsen: 17 },
-    { id: 18, nama: 'Nashita Zaina Putri Hendrianingrum', kelas: '2A', targetJuz: 2, noAbsen: 18 },
-    { id: 19, nama: 'Naufal Alvaro Radika Pratama', kelas: '2A', targetJuz: 2, noAbsen: 19 },
-    { id: 20, nama: 'Nizar Yudha Al Kahfi', kelas: '2A', targetJuz: 2, noAbsen: 20 },
-    { id: 21, nama: 'Queen Careall Anggono', kelas: '2A', targetJuz: 2, noAbsen: 21 },
-    { id: 22, nama: 'Taufan Azril Maulana', kelas: '2A', targetJuz: 2, noAbsen: 22 },
+    { id: 1, nama: 'Airlangga Saputra', kelas: '2A', targetJuz: 3, noAbsen: 1 },
+    { id: 2, nama: 'Alya Farzana Ayunindya', kelas: '2A', targetJuz: 3, noAbsen: 2 },
+    { id: 3, nama: 'Alya Nidaulkarimah', kelas: '2A', targetJuz: 3, noAbsen: 3 },
+    { id: 4, nama: 'Ashalina Ersya Bella', kelas: '2A', targetJuz: 3, noAbsen: 4 },
+    { id: 5, nama: 'Athalla Alfarizqi', kelas: '2A', targetJuz: 3, noAbsen: 5 },
+    { id: 6, nama: 'Azril Rahandika Alfariq', kelas: '2A', targetJuz: 3, noAbsen: 6 },
+    { id: 7, nama: 'Dafaa Asykar Raauf', kelas: '2A', targetJuz: 3, noAbsen: 7 },
+    { id: 8, nama: 'Fillio Farzana Abrisam', kelas: '2A', targetJuz: 3, noAbsen: 8 },
+    { id: 9, nama: 'Hafizh Althaf Alfarrisy', kelas: '2A', targetJuz: 3, noAbsen: 9 },
+    { id: 10, nama: 'Haikhal Putra Pranata', kelas: '2A', targetJuz: 3, noAbsen: 10 },
+    { id: 11, nama: 'Hisa Yumna Ayu', kelas: '2A', targetJuz: 3, noAbsen: 11 },
+    { id: 12, nama: 'Keinarra Nayla Azzahra', kelas: '2A', targetJuz: 3, noAbsen: 12 },
+    { id: 13, nama: 'Kevin Nathan Mahardika', kelas: '2A', targetJuz: 3, noAbsen: 13 },
+    { id: 14, nama: "Khofifah Yies Sa'diyah", kelas: '2A', targetJuz: 3, noAbsen: 14 },
+    { id: 15, nama: 'Muhammad Rizky Zam Zam', kelas: '2A', targetJuz: 3, noAbsen: 15 },
+    { id: 16, nama: 'Mustofa Setyo Nugroho', kelas: '2A', targetJuz: 3, noAbsen: 16 },
+    { id: 17, nama: "Muthi'ah Azza Alfara", kelas: '2A', targetJuz: 3, noAbsen: 17 },
+    { id: 18, nama: 'Nashita Zaina Putri Hendrianingrum', kelas: '2A', targetJuz: 3, noAbsen: 18 },
+    { id: 19, nama: 'Naufal Alvaro Radika Pratama', kelas: '2A', targetJuz: 3, noAbsen: 19 },
+    { id: 20, nama: 'Nizar Yudha Al Kahfi', kelas: '2A', targetJuz: 3, noAbsen: 20 },
+    { id: 21, nama: 'Queen Careall Anggono', kelas: '2A', targetJuz: 3, noAbsen: 21 },
+    { id: 22, nama: 'Taufan Azril Maulana', kelas: '2A', targetJuz: 3, noAbsen: 22 },
   ]);
 }
 
 if (!getData('laporan', null)) {
   setData('laporan', [
-    { id: 1, santriId: 1, tanggal: '2025-04-15', jenis: 'ziyadah', surah: 'Al-Baqarah', ayatMulai: 1, ayatSelesai: 20, halaman: 2, nilaiTajwid: 'A', nilaiFasih: 'B', catatan: 'Bacaan bagus, perlu perhatikan mad', guru: 'Ust. Abdullah' },
-    { id: 2, santriId: 2, tanggal: '2025-04-15', jenis: 'murojaah', surah: 'Al-Fatihah', ayatMulai: 1, ayatSelesai: 7, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'A', catatan: 'Sangat lancar dan fasih', guru: 'Usth. Fatimah' },
-    { id: 3, santriId: 5, tanggal: '2025-04-14', jenis: 'ziyadah', surah: 'Ali Imran', ayatMulai: 1, ayatSelesai: 15, halaman: 50, nilaiTajwid: 'B', nilaiFasih: 'B', catatan: 'Perlu latihan tajwid lagi', guru: 'Ust. Abdullah' },
+    { id: 1, santriId: 1, tanggal: '2025-04-15', jenis: 'ziyadah', surah: "An-Naba (78)", ayatMulai: 1, ayatSelesai: 20, halaman: 583, nilaiTajwid: 'A', nilaiFasih: 'B', catatan: 'Bacaan bagus, perlu perhatikan mad', guru: 'Ust. Abdullah' },
+    { id: 2, santriId: 2, tanggal: '2025-04-15', jenis: 'murojaah', surah: "Al-Mulk (67)", ayatMulai: 1, ayatSelesai: 30, halaman: 562, nilaiTajwid: 'A', nilaiFasih: 'A', catatan: 'Sangat lancar dan fasih', guru: 'Usth. Fatimah' },
+    { id: 3, santriId: 5, tanggal: '2025-04-14', jenis: 'ziyadah', surah: "Al-Ikhlas (112)", ayatMulai: 1, ayatSelesai: 4, halaman: 604, nilaiTajwid: 'B', nilaiFasih: 'B', catatan: 'Perlu latihan tajwid lagi', guru: 'Ust. Abdullah' },
   ]);
 }
 
@@ -162,27 +243,13 @@ if (!getData('guruPin', null)) setData('guruPin', '1234');
 
 if (!getData('waliData', null)) {
   setData('waliData', [
-    { santriId: 1, pin: '0001' },
-    { santriId: 2, pin: '0002' },
-    { santriId: 3, pin: '0003' },
-    { santriId: 4, pin: '0004' },
-    { santriId: 5, pin: '0005' },
-    { santriId: 6, pin: '0006' },
-    { santriId: 7, pin: '0007' },
-    { santriId: 8, pin: '0008' },
-    { santriId: 9, pin: '0009' },
-    { santriId: 10, pin: '0010' },
-    { santriId: 11, pin: '0011' },
-    { santriId: 12, pin: '0012' },
-    { santriId: 13, pin: '0013' },
-    { santriId: 14, pin: '0014' },
-    { santriId: 15, pin: '0015' },
-    { santriId: 16, pin: '0016' },
-    { santriId: 17, pin: '0017' },
-    { santriId: 18, pin: '0018' },
-    { santriId: 19, pin: '0019' },
-    { santriId: 20, pin: '0020' },
-    { santriId: 21, pin: '0021' },
+    { santriId: 1, pin: '0001' }, { santriId: 2, pin: '0002' }, { santriId: 3, pin: '0003' },
+    { santriId: 4, pin: '0004' }, { santriId: 5, pin: '0005' }, { santriId: 6, pin: '0006' },
+    { santriId: 7, pin: '0007' }, { santriId: 8, pin: '0008' }, { santriId: 9, pin: '0009' },
+    { santriId: 10, pin: '0010' }, { santriId: 11, pin: '0011' }, { santriId: 12, pin: '0012' },
+    { santriId: 13, pin: '0013' }, { santriId: 14, pin: '0014' }, { santriId: 15, pin: '0015' },
+    { santriId: 16, pin: '0016' }, { santriId: 17, pin: '0017' }, { santriId: 18, pin: '0018' },
+    { santriId: 19, pin: '0019' }, { santriId: 20, pin: '0020' }, { santriId: 21, pin: '0021' },
     { santriId: 22, pin: '0022' },
   ]);
 }
@@ -262,8 +329,12 @@ function renderGuru() {
 
 function setTab(t) { activeTab = t; alertMsg = null; render(); }
 
+// ── INPUT FORM ────────────────────────────────────────────────────────
 function renderInputForm() {
   const santri = getData('santri', []);
+  const surahOptions = SURAH_DATA.map(s =>
+    `<option value="${s.nama}" data-ayat="${s.ayat}" data-juz="${s.juz}">Juz ${s.juz} — ${s.nama}</option>`
+  ).join('');
   return `
   ${alertMsg ? `<div class="alert alert-success">${alertMsg}</div>` : ''}
   <div class="card">
@@ -292,7 +363,10 @@ function renderInputForm() {
       </div>
       <div class="form-group">
         <label>Nama Surah</label>
-        <input type="text" id="f-surah" placeholder="Contoh: Al-Baqarah">
+        <select id="f-surah" onchange="onSurahChange()">
+          <option value="">-- Pilih Surah --</option>
+          ${surahOptions}
+        </select>
       </div>
     </div>
     <div class="form-row">
@@ -301,8 +375,8 @@ function renderInputForm() {
         <input type="number" id="f-ayat-mulai" placeholder="1" min="1">
       </div>
       <div class="form-group">
-        <label>Ayat Selesai</label>
-        <input type="number" id="f-ayat-selesai" placeholder="20" min="1">
+        <label>Ayat Selesai <span id="max-ayat-label" style="color:#1a6b4a;font-weight:700"></span></label>
+        <input type="number" id="f-ayat-selesai" placeholder="—" min="1">
       </div>
     </div>
     <div class="form-row">
@@ -343,13 +417,29 @@ function renderInputForm() {
   </div>`;
 }
 
+function onSurahChange() {
+  const sel = document.getElementById('f-surah');
+  const opt = sel.options[sel.selectedIndex];
+  const maxAyat = opt?.dataset?.ayat;
+  const label = document.getElementById('max-ayat-label');
+  const ayatSelesai = document.getElementById('f-ayat-selesai');
+  if (maxAyat) {
+    label.textContent = `(Total: ${maxAyat} ayat)`;
+    ayatSelesai.max = maxAyat;
+    ayatSelesai.placeholder = maxAyat;
+  } else {
+    label.textContent = '';
+    ayatSelesai.placeholder = '—';
+  }
+}
+
 function simpanLaporan() {
   const santriId = parseInt(document.getElementById('f-santri').value);
   const tanggal = document.getElementById('f-tanggal').value;
   const surah = document.getElementById('f-surah').value.trim();
   if (!santriId) { alert('Pilih santri terlebih dahulu'); return; }
   if (!tanggal) { alert('Isi tanggal'); return; }
-  if (!surah) { alert('Isi nama surah'); return; }
+  if (!surah) { alert('Pilih nama surah'); return; }
   const laporan = getData('laporan', []);
   const id = Date.now();
   laporan.unshift({
@@ -423,22 +513,28 @@ function hapusLaporan(id) {
   render();
 }
 
+// ── DATA SANTRI ───────────────────────────────────────────────────────
 function renderDataSantri() {
   const santri = getData('santri', []);
   const wali = getData('waliData', []);
   return `
   <div class="topbar">
     <h2>Data Santri Kelas 2A (${santri.length} Siswa)</h2>
+    <button class="btn btn-outline btn-sm" onclick="showTambahSantri()">➕ Tambah Siswa</button>
   </div>
   ${santri.map(s => {
     const w = wali.find(x=>x.santriId===s.id);
     const laporan = getData('laporan', []).filter(l=>l.santriId===s.id);
     return `<div class="card" style="padding:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <div>
+        <div style="flex:1">
           <div style="font-weight:700">${s.noAbsen}. ${s.nama}</div>
           <div style="font-size:13px;color:#718096">Kelas ${s.kelas} · Target ${s.targetJuz} Juz · ${laporan.length} laporan</div>
           <div style="font-size:12px;color:#a0aec0;margin-top:4px">PIN Wali: <b>${w?.pin || '-'}</b></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-edit" onclick="showEditSantri(${s.id})">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="hapusSantri(${s.id})">🗑</button>
         </div>
       </div>
     </div>`;
@@ -446,12 +542,143 @@ function renderDataSantri() {
   
   <div class="pin-list">
     <h4>📋 Daftar PIN Wali Murid (untuk dibagikan)</h4>
-    ${santri.slice(0, 22).map(s => {
+    ${santri.map(s => {
       const w = wali.find(x=>x.santriId===s.id);
-      return `<div class="pin-item">${s.noAbsen}. <strong>${s.nama}</strong> → PIN: <strong>${w?.pin}</strong></div>`;
+      return `<div class="pin-item">${s.noAbsen}. <strong>${s.nama}</strong> → PIN: <strong>${w?.pin || '-'}</strong></div>`;
     }).join('')}
   </div>`;
 }
+
+function showTambahSantri() {
+  const santri = getData('santri', []);
+  const nextNo = santri.length > 0 ? Math.max(...santri.map(s=>s.noAbsen)) + 1 : 1;
+  const nextId = santri.length > 0 ? Math.max(...santri.map(s=>s.id)) + 1 : 1;
+  document.getElementById('modal-container').innerHTML = `
+  <div class="modal-overlay" onclick="closeModalOverlay(event)">
+    <div class="modal-box">
+      <h3>➕ Tambah Siswa Baru</h3>
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="m-nama" placeholder="Nama siswa...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kelas</label>
+          <input type="text" id="m-kelas" value="2A">
+        </div>
+        <div class="form-group">
+          <label>No. Absen</label>
+          <input type="number" id="m-absen" value="${nextNo}" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Target Juz</label>
+          <input type="number" id="m-target" value="3" min="1" max="30">
+        </div>
+        <div class="form-group">
+          <label>PIN Wali</label>
+          <input type="text" id="m-pin" placeholder="4–6 digit" maxlength="6" inputmode="numeric" value="${String(nextId).padStart(4,'0')}">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="simpanTambahSantri(${nextId})">💾 Simpan</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function simpanTambahSantri(newId) {
+  const nama = document.getElementById('m-nama').value.trim();
+  const kelas = document.getElementById('m-kelas').value.trim();
+  const noAbsen = parseInt(document.getElementById('m-absen').value);
+  const targetJuz = parseInt(document.getElementById('m-target').value) || 3;
+  const pin = document.getElementById('m-pin').value.trim();
+  if (!nama) { alert('Isi nama siswa'); return; }
+  if (!pin) { alert('Isi PIN wali'); return; }
+  const santri = getData('santri', []);
+  santri.push({ id: newId, nama, kelas, targetJuz, noAbsen });
+  setData('santri', santri);
+  const wali = getData('waliData', []);
+  wali.push({ santriId: newId, pin });
+  setData('waliData', wali);
+  closeModal();
+  render();
+}
+
+function showEditSantri(id) {
+  const santri = getData('santri', []);
+  const wali = getData('waliData', []);
+  const s = santri.find(x=>x.id===id);
+  const w = wali.find(x=>x.santriId===id);
+  if (!s) return;
+  document.getElementById('modal-container').innerHTML = `
+  <div class="modal-overlay" onclick="closeModalOverlay(event)">
+    <div class="modal-box">
+      <h3>✏️ Edit Data Siswa</h3>
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" id="m-nama" value="${s.nama}">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kelas</label>
+          <input type="text" id="m-kelas" value="${s.kelas}">
+        </div>
+        <div class="form-group">
+          <label>No. Absen</label>
+          <input type="number" id="m-absen" value="${s.noAbsen}" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Target Juz</label>
+          <input type="number" id="m-target" value="${s.targetJuz}" min="1" max="30">
+        </div>
+        <div class="form-group">
+          <label>PIN Wali</label>
+          <input type="text" id="m-pin" value="${w?.pin || ''}" maxlength="6" inputmode="numeric">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="simpanEditSantri(${id})">💾 Simpan</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function simpanEditSantri(id) {
+  const nama = document.getElementById('m-nama').value.trim();
+  const kelas = document.getElementById('m-kelas').value.trim();
+  const noAbsen = parseInt(document.getElementById('m-absen').value);
+  const targetJuz = parseInt(document.getElementById('m-target').value) || 3;
+  const pin = document.getElementById('m-pin').value.trim();
+  if (!nama) { alert('Isi nama siswa'); return; }
+  const santri = getData('santri', []).map(s => s.id === id ? {...s, nama, kelas, noAbsen, targetJuz} : s);
+  setData('santri', santri);
+  if (pin) {
+    const wali = getData('waliData', []).map(w => w.santriId === id ? {...w, pin} : w);
+    setData('waliData', wali);
+  }
+  closeModal();
+  render();
+}
+
+function hapusSantri(id) {
+  if (!confirm('Hapus siswa ini? Semua laporannya juga akan dihapus.')) return;
+  const santri = getData('santri', []).filter(s => s.id !== id);
+  setData('santri', santri);
+  const laporan = getData('laporan', []).filter(l => l.santriId !== id);
+  setData('laporan', laporan);
+  const wali = getData('waliData', []).filter(w => w.santriId !== id);
+  setData('waliData', wali);
+  render();
+}
+
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+function closeModalOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
 
 // ── WALI VIEW ─────────────────────────────────────────────────────────
 function renderWali() {
@@ -477,7 +704,7 @@ function renderWali() {
         <div style="width:48px;height:48px;background:#c6f6d5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px">📖</div>
         <div>
           <div style="font-size:18px;font-weight:700">${santri.nama}</div>
-          <div style="font-size:13px;color:#718096">Kelas ${santri.kelas} · Target ${santri.targetJuz} Juz</div>
+          <div style="font-size:13px;color:#718096">Kelas ${santri.kelas} · Target ${santri.targetJuz} Juz (Juz 28–30)</div>
         </div>
       </div>
       <div style="margin-bottom:6px;font-size:13px;color:#4a5568;font-weight:600">Progress Hafalan</div>
