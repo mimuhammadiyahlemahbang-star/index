@@ -92,6 +92,12 @@
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
   .topbar h2 { font-size: 17px; font-weight: 700; }
 
+  /* PIN LIST */
+  .pin-list { background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: 10px; padding: 14px; margin-top: 16px; }
+  .pin-list h4 { font-size: 14px; color: #92400e; margin-bottom: 8px; }
+  .pin-item { font-size: 12px; color: #78350f; padding: 4px 0; }
+  .pin-item strong { color: #92400e; }
+
   /* RESPONSIVE */
   @media (max-width: 480px) {
     .form-row { grid-template-columns: 1fr; }
@@ -116,30 +122,72 @@
 const getData = (key, def) => { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } };
 const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
-// Inisialisasi data awal jika kosong
+// Inisialisasi data awal - 22 siswa sesuai daftar
 if (!getData('santri', null)) {
   setData('santri', [
-    { id: 1, nama: 'Ahmad Fauzi', kelas: '4A', targetJuz: 5 },
-    { id: 2, nama: 'Siti Aminah', kelas: '4A', targetJuz: 5 },
-    { id: 3, nama: 'Muhammad Rizki', kelas: '4B', targetJuz: 3 },
+    { id: 1, nama: 'Airlangga Saputra', kelas: '4A', targetJuz: 5, noAbsen: 1 },
+    { id: 2, nama: 'Alya Farzana Ayunindya', kelas: '4A', targetJuz: 5, noAbsen: 2 },
+    { id: 3, nama: 'Alya Nidaulkarimah', kelas: '4A', targetJuz: 5, noAbsen: 3 },
+    { id: 4, nama: 'Ashalina Ersya Bella', kelas: '4A', targetJuz: 5, noAbsen: 4 },
+    { id: 5, nama: 'Athalla Alfarizqi', kelas: '4A', targetJuz: 5, noAbsen: 5 },
+    { id: 6, nama: 'Azril Rahandika Alfariq', kelas: '4A', targetJuz: 5, noAbsen: 6 },
+    { id: 7, nama: 'Dafaa Asykar Raauf', kelas: '4A', targetJuz: 5, noAbsen: 7 },
+    { id: 8, nama: 'Fillio Farzana Abrisam', kelas: '4A', targetJuz: 5, noAbsen: 8 },
+    { id: 9, nama: 'Hafizh Althaf Alfarrisy', kelas: '4A', targetJuz: 5, noAbsen: 9 },
+    { id: 10, nama: 'Haikhal Putra Pranata', kelas: '4A', targetJuz: 5, noAbsen: 10 },
+    { id: 11, nama: 'Hisa Yumna Ayu', kelas: '4A', targetJuz: 5, noAbsen: 11 },
+    { id: 12, nama: 'Keinarra Nayla Azzahra', kelas: '4A', targetJuz: 5, noAbsen: 12 },
+    { id: 13, nama: 'Kevin Nathan Mahardika', kelas: '4A', targetJuz: 5, noAbsen: 13 },
+    { id: 14, nama: 'Khofifah Yies Sa\'diyah', kelas: '4A', targetJuz: 5, noAbsen: 14 },
+    { id: 15, nama: 'Muhammad Rizky Zam Zam', kelas: '4A', targetJuz: 5, noAbsen: 15 },
+    { id: 16, nama: 'Mustofa Setyo Nugroho', kelas: '4A', targetJuz: 5, noAbsen: 16 },
+    { id: 17, nama: 'Muthi\'ah Azza Alfara', kelas: '4A', targetJuz: 5, noAbsen: 17 },
+    { id: 18, nama: 'Nashita Zaina Putri Hendrianingrum', kelas: '4A', targetJuz: 5, noAbsen: 18 },
+    { id: 19, nama: 'Naufal Alvaro Radika Pratama', kelas: '4A', targetJuz: 5, noAbsen: 19 },
+    { id: 20, nama: 'Nizar Yudha Al Kahfi', kelas: '4A', targetJuz: 5, noAbsen: 20 },
+    { id: 21, nama: 'Queen Careall Anggono', kelas: '4A', targetJuz: 5, noAbsen: 21 },
+    { id: 22, nama: 'Taufan Azril Maulana', kelas: '4A', targetJuz: 5, noAbsen: 22 },
   ]);
 }
+
 if (!getData('laporan', null)) {
   setData('laporan', [
-    { id: 1, santriId: 1, tanggal: '2025-01-15', jenis: 'ziyadah', surah: 'Al-Baqarah', ayatMulai: 1, ayatSelesai: 20, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'B', catatan: 'Bacaan bagus, perlu perhatikan mad', guru: 'Ust. Abdullah' },
-    { id: 2, santriId: 2, tanggal: '2025-01-15', jenis: 'murojaah', surah: 'Al-Fatihah', ayatMulai: 1, ayatSelesai: 7, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'A', catatan: 'Sangat lancar dan fasih', guru: 'Ust. Abdullah' },
+    { id: 1, santriId: 1, tanggal: '2025-04-15', jenis: 'ziyadah', surah: 'Al-Baqarah', ayatMulai: 1, ayatSelesai: 20, halaman: 2, nilaiTajwid: 'A', nilaiFasih: 'B', catatan: 'Bacaan bagus, perlu perhatikan mad', guru: 'Ust. Abdullah' },
+    { id: 2, santriId: 2, tanggal: '2025-04-15', jenis: 'murojaah', surah: 'Al-Fatihah', ayatMulai: 1, ayatSelesai: 7, halaman: 1, nilaiTajwid: 'A', nilaiFasih: 'A', catatan: 'Sangat lancar dan fasih', guru: 'Usth. Fatimah' },
+    { id: 3, santriId: 5, tanggal: '2025-04-14', jenis: 'ziyadah', surah: 'Ali Imran', ayatMulai: 1, ayatSelesai: 15, halaman: 50, nilaiTajwid: 'B', nilaiFasih: 'B', catatan: 'Perlu latihan tajwid lagi', guru: 'Ust. Abdullah' },
   ]);
 }
+
 if (!getData('guruPin', null)) setData('guruPin', '1234');
+
 if (!getData('waliData', null)) {
   setData('waliData', [
     { santriId: 1, pin: '0001' },
     { santriId: 2, pin: '0002' },
     { santriId: 3, pin: '0003' },
+    { santriId: 4, pin: '0004' },
+    { santriId: 5, pin: '0005' },
+    { santriId: 6, pin: '0006' },
+    { santriId: 7, pin: '0007' },
+    { santriId: 8, pin: '0008' },
+    { santriId: 9, pin: '0009' },
+    { santriId: 10, pin: '0010' },
+    { santriId: 11, pin: '0011' },
+    { santriId: 12, pin: '0012' },
+    { santriId: 13, pin: '0013' },
+    { santriId: 14, pin: '0014' },
+    { santriId: 15, pin: '0015' },
+    { santriId: 16, pin: '0016' },
+    { santriId: 17, pin: '0017' },
+    { santriId: 18, pin: '0018' },
+    { santriId: 19, pin: '0019' },
+    { santriId: 20, pin: '0020' },
+    { santriId: 21, pin: '0021' },
+    { santriId: 22, pin: '0022' },
   ]);
 }
 
-let currentMode = null; // 'guru' | 'wali'
+let currentMode = null;
 let currentSantriId = null;
 let activeTab = 'input';
 let alertMsg = null;
@@ -178,11 +226,6 @@ function renderLogin() {
       ${loginRole === 'wali' ? '<p style="font-size:12px;color:#718096;margin-bottom:12px">PIN diberikan oleh guru/sekolah untuk setiap wali murid</p>' : ''}
       <button class="btn btn-primary" onclick="doLogin()">Masuk</button>
       <div id="login-err"></div>
-      <div style="margin-top:20px;padding:12px;background:#fffbeb;border-radius:8px;font-size:12px;color:#92400e">
-        <b>Demo PIN:</b><br>
-        Guru: <b>1234</b><br>
-        Wali Ahmad Fauzi: <b>0001</b> &nbsp;|&nbsp; Wali Siti Aminah: <b>0002</b>
-      </div>
     </div>
   </div>`;
 }
@@ -230,7 +273,7 @@ function renderInputForm() {
         <label>Nama Santri</label>
         <select id="f-santri">
           <option value="">-- Pilih Santri --</option>
-          ${santri.map(s=>`<option value="${s.id}">${s.nama} (${s.kelas})</option>`).join('')}
+          ${santri.map(s=>`<option value="${s.id}">${s.noAbsen}. ${s.nama}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -349,7 +392,7 @@ function renderDaftarLaporan() {
       return `<div class="laporan-item">
         <div class="laporan-header">
           <div>
-            <div class="laporan-nama">${s?.nama || 'Tidak diketahui'}</div>
+            <div class="laporan-nama">${s?.noAbsen}. ${s?.nama || 'Tidak diketahui'}</div>
             <div class="laporan-tanggal">${formatTanggal(l.tanggal)} · ${l.guru}</div>
           </div>
           <div style="display:flex;gap:6px;align-items:center">
@@ -385,62 +428,29 @@ function renderDataSantri() {
   const wali = getData('waliData', []);
   return `
   <div class="topbar">
-    <h2>Data Santri</h2>
-    <button class="btn btn-outline btn-sm" onclick="tambahSantri()">+ Tambah</button>
+    <h2>Data Santri Kelas 4A (${santri.length} Siswa)</h2>
   </div>
   ${santri.map(s => {
     const w = wali.find(x=>x.santriId===s.id);
+    const laporan = getData('laporan', []).filter(l=>l.santriId===s.id);
     return `<div class="card" style="padding:14px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-weight:700">${s.nama}</div>
-          <div style="font-size:13px;color:#718096">Kelas ${s.kelas} · Target ${s.targetJuz} Juz</div>
+          <div style="font-weight:700">${s.noAbsen}. ${s.nama}</div>
+          <div style="font-size:13px;color:#718096">Kelas ${s.kelas} · Target ${s.targetJuz} Juz · ${laporan.length} laporan</div>
           <div style="font-size:12px;color:#a0aec0;margin-top:4px">PIN Wali: <b>${w?.pin || '-'}</b></div>
         </div>
-        <button class="btn btn-sm btn-danger" onclick="hapusSantri(${s.id})">🗑</button>
       </div>
     </div>`;
   }).join('')}
-  <div class="card" style="margin-top:20px">
-    <h3>➕ Tambah Santri Baru</h3>
-    <div class="form-row">
-      <div class="form-group"><label>Nama Lengkap</label><input type="text" id="ns-nama" placeholder="Nama santri"></div>
-      <div class="form-group"><label>Kelas</label><input type="text" id="ns-kelas" placeholder="4A"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Target Juz</label><input type="number" id="ns-target" placeholder="5" min="1" max="30"></div>
-      <div class="form-group"><label>PIN Wali (unik)</label><input type="text" id="ns-pin" placeholder="4 digit angka" maxlength="6"></div>
-    </div>
-    <button class="btn btn-primary" onclick="simpanSantri()">Simpan Santri</button>
+  
+  <div class="pin-list">
+    <h4>📋 Daftar PIN Wali Murid (untuk dibagikan)</h4>
+    ${santri.slice(0, 22).map(s => {
+      const w = wali.find(x=>x.santriId===s.id);
+      return `<div class="pin-item">${s.noAbsen}. <strong>${s.nama}</strong> → PIN: <strong>${w?.pin}</strong></div>`;
+    }).join('')}
   </div>`;
-}
-
-function tambahSantri() { setTab('santri'); }
-
-function simpanSantri() {
-  const nama = document.getElementById('ns-nama').value.trim();
-  const kelas = document.getElementById('ns-kelas').value.trim();
-  const target = parseInt(document.getElementById('ns-target').value) || 5;
-  const pin = document.getElementById('ns-pin').value.trim();
-  if (!nama || !kelas || !pin) { alert('Lengkapi semua data'); return; }
-  const santri = getData('santri', []);
-  const wali = getData('waliData', []);
-  if (wali.some(w=>w.pin===pin)) { alert('PIN sudah dipakai santri lain'); return; }
-  const id = Date.now();
-  santri.push({ id, nama, kelas, targetJuz: target });
-  wali.push({ santriId: id, pin });
-  setData('santri', santri);
-  setData('waliData', wali);
-  alertMsg = `✅ Santri ${nama} berhasil ditambahkan. PIN wali: ${pin}`;
-  render();
-}
-
-function hapusSantri(id) {
-  if (!confirm('Hapus santri ini? Semua laporan terkait akan ikut terhapus.')) return;
-  setData('santri', getData('santri',[]).filter(s=>s.id!==id));
-  setData('waliData', getData('waliData',[]).filter(w=>w.santriId!==id));
-  setData('laporan', getData('laporan',[]).filter(l=>l.santriId!==id));
-  render();
 }
 
 // ── WALI VIEW ─────────────────────────────────────────────────────────
@@ -448,10 +458,10 @@ function renderWali() {
   const santri = getData('santri', []).find(s=>s.id===currentSantriId);
   if (!santri) { currentMode = null; render(); return ''; }
   const laporan = getData('laporan', []).filter(l=>l.santriId===currentSantriId);
-  const totalHalaman = laporan.reduce((a,l)=> a + (l.jenis==='ziyadah' ? (l.ayatSelesai-l.ayatMulai+1) : 0), 0);
+  const totalAyat = laporan.reduce((a,l)=> a + (l.jenis==='ziyadah' ? (l.ayatSelesai-l.ayatMulai+1) : 0), 0);
   const sesiCount = laporan.length;
   const avgTajwid = laporan.length ? laporan.filter(l=>l.nilaiTajwid==='A').length : 0;
-  const progress = Math.min(100, Math.round((totalHalaman / (santri.targetJuz * 600)) * 100));
+  const progress = Math.min(100, Math.round((totalAyat / (santri.targetJuz * 100)) * 100));
 
   return `
   <div style="display:flex;justify-content:flex-end;padding:8px 16px">
@@ -479,8 +489,8 @@ function renderWali() {
 
     <div class="stat-grid">
       <div class="stat-box"><div class="val">${sesiCount}</div><div class="lbl">Total Sesi</div></div>
-      <div class="stat-box"><div class="val">${totalHalaman}</div><div class="lbl">Ayat Dihafal</div></div>
-      <div class="stat-box"><div class="val">${avgTajwid}</div><div class="lbl">Nilai A Tajwid</div></div>
+      <div class="stat-box"><div class="val">${totalAyat}</div><div class="lbl">Ayat Dihafal</div></div>
+      <div class="stat-box"><div class="val">${avgTajwid}</div><div class="lbl">Nilai A</div></div>
     </div>
 
     <div class="card">
@@ -517,7 +527,6 @@ function formatTanggal(str) {
   } catch { return str; }
 }
 
-// Mulai
 render();
 </script>
 </body>
